@@ -1,134 +1,151 @@
 #include <iostream>
-#include <cstdlib>
+#include <string>
 
 using namespace std;
 
-struct node *phead = NULL;
-
-struct node
+struct antrian
 {
-  int data;
   char plat[10];
   char jenis[10];
-  struct node *next;
+  antrian *next;
 };
-typedef struct node node;
 
-void masuk_antrian()
+struct parkir
 {
-  struct node *pnew = (struct node *)malloc(sizeof(struct node));
-  cout << "Masukan plat nomor : ";
-  cin >> pnew->plat;
-  cout << "Masukan jenis kendaraan : ";
-  cin >> pnew->jenis;
-  pnew->next = NULL;
+  char plat[10];
+  char jenis[10];
+  parkir *next;
+};
+
+struct antrian *phead = NULL;
+struct antrian *ptail = NULL;
+struct parkir *phead2 = NULL;
+struct parkir *ptail2 = NULL;
+
+void tambahAntrian()
+{
+  antrian *baru;
+  baru = new antrian;
+  cout << "Masukkan Plat: ";
+  cin.ignore();
+  cin.getline(baru->plat, 10);
+  cout << "Masukkan Jenis: ";
+  cin.getline(baru->jenis, 10);
+  baru->next = NULL;
   if (phead == NULL)
   {
-    phead = pnew;
+    phead = baru;
+    ptail = baru;
   }
   else
   {
-    struct node *pcurrent = phead;
-    while (pcurrent->next != NULL)
+    ptail->next = baru;
+    ptail = baru;
+  }
+}
+
+void hapusAntrian();
+void tambahParkir()
+{
+  // Menyambungkan antrian ke parkir
+  // Jika tambah parkir, maka antrian pertama akan dihapus
+  if (phead == NULL)
+  {
+    cout << "Antrian Kosong!" << endl;
+    return;
+  }
+  struct parkir *baru;
+  baru = new struct parkir;
+  strcpy(baru->plat, phead->plat);
+  strcpy(baru->jenis, phead->jenis);
+  baru->next = NULL;
+  if (phead2 == NULL)
+  {
+    phead2 = baru;
+    ptail2 = baru;
+  }
+  else
+  {
+    ptail2->next = baru;
+    ptail2 = baru;
+  }
+  hapusAntrian();
+}
+
+void tampilAntrian()
+{
+  antrian *bantu;
+  bantu = phead;
+  if (bantu == NULL)
+  {
+    cout << "Antrian Kosong!" << endl;
+  }
+  else
+  {
+    while (bantu != NULL)
     {
-      pcurrent = pcurrent->next;
+      cout << "Plat: " << bantu->plat << endl;
+      cout << "Jenis: " << bantu->jenis << endl
+           << endl;
+      bantu = bantu->next;
     }
-    pcurrent->next = pnew;
   }
-  cout << "Data berhasil dimasukkan\n";
-  return;
 }
 
-void keluar_antrian()
+void tampilParkir()
 {
-  if (phead == NULL)
+  parkir *bantu;
+  bantu = phead2;
+  if (bantu == NULL)
   {
-    cout << "Antrian kosong\n";
+    cout << "Parkir Kosong!" << endl;
   }
-  cout << "Masukan plat nomor yang akan dihapus : ";
-  char plat[10];
-  cin >> plat;
-  struct node *pcurrent = phead;
-  struct node *pprev = NULL;
-  while (pcurrent != NULL)
+  else
   {
-    if (strcmp(pcurrent->plat, plat) == 0)
+    while (bantu != NULL)
     {
-      if (pprev == NULL)
-      {
-        phead = pcurrent->next;
-      }
-      else
-      {
-        pprev->next = pcurrent->next;
-      }
-      free(pcurrent);
-      cout << "Data berhasil dihapus\n";
+      cout << "Plat: " << bantu->plat << endl;
+      cout << "Jenis: " << bantu->jenis << endl
+           << endl;
+      bantu = bantu->next;
     }
-    pprev = pcurrent;
-    pcurrent = pcurrent->next;
   }
 }
 
-void tampil_antrian()
+void hapusAntrian()
 {
-  struct node *pcurrent = phead;
-  int i = 1;
-  if (phead == NULL)
+  antrian *hapus;
+  hapus = phead;
+  if (hapus == NULL)
   {
-    cout << "Antrian kosong\n";
+    cout << "Antrian Kosong!" << endl;
   }
-  cout << "--- Antrian parkir ---\n\n";
-  while (pcurrent != NULL)
+  else
   {
-    cout << i << ". ";
-    cout << "Plat nomor : " << pcurrent->plat << endl;
-    pcurrent = pcurrent->next;
-    i++;
+    phead = hapus->next;
+    delete hapus;
   }
 }
 
-void tampil_parkir()
+void hapusParkir()
 {
-  cout << "Kendaraan yang sudah masuk parkir\n";
-  struct node *pcurrent = phead;
-  int i = 1;
-  if (phead == NULL)
+  parkir *hapus;
+  hapus = phead2;
+  if (hapus == NULL)
   {
-    cout << "Parkir kosong\n";
+    cout << "Parkir Kosong!" << endl;
   }
-  cout << "--- Parkir ---\n\n";
-  while (pcurrent != NULL)
+  else
   {
-    cout << "Plat nomor : " << pcurrent->plat << endl;
-    cout << "Jenis kendaraan : " << pcurrent->jenis << endl;
-    pcurrent = pcurrent->next;
+    while (hapus->next != ptail2)
+    {
+      hapus = hapus->next;
+    }
+    ptail2 = hapus;
+    hapus = hapus->next;
+    ptail2->next = NULL;
+    delete hapus;
   }
-}
-
-void masuk_parkir()
-{
-  if (phead == NULL)
-  {
-    cout << "Parkir kosong\n";
-  }
-  cout << "Kendaraan dari antrian akan di masukkan ke parkiran\n";
-  struct node *pprev = phead;
-  phead = phead->next;
-  free(pprev);
-  cout << "Mobil berhasil masuk\n";
-}
-
-void keluar_parkir()
-{
-  if (phead == NULL)
-  {
-    cout << "Parkir kosong\n";
-  }
-  struct node *pprev = phead;
-  phead = phead->next;
-  free(pprev);
-  cout << "Mobil berhasil keluar\n";
 }
 
 int main()
@@ -140,12 +157,12 @@ int main()
     system("cls");
     cout << "--- MENU ---\n\n";
     cout << "* Program Parkir Dengan Stack dan Queue *\n\n";
-    cout << "1. Masuk antrian parkir\n";
-    cout << "2. Keluar antrian parkir\n";
-    cout << "3. Tampilkan antrian parkir\n";
-    cout << "4. Tampilkan data kendaraan yang parkir\n";
-    cout << "5. Masuk parkir\n";
-    cout << "6. Keluar parkir\n";
+    cout << "1. Tambah Antrian\n";
+    cout << "2. Tambah Parkir\n";
+    cout << "3. Tampilkan Antrian\n";
+    cout << "4. Tampilkan Parkir\n";
+    cout << "5. Hapus Antrian\n";
+    cout << "6. Hapus Parkir\n";
     cout << "\n0. Keluar program\n\n";
     cout << "Pilih : ";
     cin >> pilih;
@@ -153,22 +170,22 @@ int main()
     switch (pilih)
     {
     case 1:
-      masuk_antrian();
+      tambahAntrian();
       break;
     case 2:
-      keluar_antrian();
+      tambahParkir();
       break;
     case 3:
-      tampil_antrian();
+      tampilAntrian();
       break;
     case 4:
-      tampil_parkir();
+      tampilParkir();
       break;
     case 5:
-      masuk_parkir();
+      hapusAntrian();
       break;
     case 6:
-      keluar_parkir();
+      hapusParkir();
       break;
     default:
       system("cls");
