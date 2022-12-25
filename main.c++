@@ -92,6 +92,8 @@ void tampilAntrian()
   }
 }
 
+//---
+
 void tampilParkir()
 {
   parkir *bantu;
